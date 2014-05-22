@@ -2,12 +2,17 @@ library (lattice)
 library (ggplot2)
 
 
-url<- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
-download.file(url, "exdata_data_NEI_data.zip")
-unzip("exdata_data_NEI_data.zip", exdir = "data")
-file.remove("exdata_data_NEI_data.zip")
+if (!file.exists("data/summarySCC_PM25.rds")) 
+{
+  url<- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
+  download.file(url, "exdata_data_NEI_data.zip")
+  unzip("exdata_data_NEI_data.zip", exdir = "data")
+  file.remove("exdata_data_NEI_data.zip")
+}
 
-dir()
+
+dir("data")
+
 ## This first line will likely take a few seconds. Be patient!
 NEI <- readRDS("data/summarySCC_PM25.rds")
 SCC <- readRDS("data/Source_Classification_Code.rds")
@@ -513,4 +518,38 @@ ggplot(motor_balsNEI, aes( x=fips, y=log(Emissions),fill=fips) ) +
   facet_grid(. ~ year) +
   labs(title = "Emissions in Baltimora and Los Angeles related to motor vehicle",
        y = "log(PM2.5 in ton)", x = "cities in years")
+
+
+ggplot(motor_balsNEI, aes( log(Emissions),fill=fips) ) +
+  geom_density(alpha=.3) +
+  facet_wrap( ~ year, ncol=2) +
+
+  labs(title = "Emissions in Baltimora and Los Angeles related to motor vehicle",
+       y = "log(PM2.5 in ton)", x = "cities in years")
+
+library (plyr)
+
+fiye<-ddply(motor_balsNEI, .(fips,year), summarise,
+             totemis= sum(Emissions)/1000,
+             meanemis=mean(Emissions)/1000,
+            ltotemis= sum(log(Emissions)),
+            lmeanemis=mean(log(Emissions))
+            
+            )
+
+fiye
+
+ggplot(fiye, aes(year, ltotemis)) + 
+  geom_point(aes(color = fips), show_guide = FALSE,
+             size = 10, alpha = 1/2) + 
+  ggtitle("Emissions in Baltimora and Los Angeles related to motor vehicle") +
+  ylab("tot log(PM2.5 in ton)") +
+  geom_text(aes(label=fips), size=5) 
+
+ggplot(fiye, aes(x=year, y=ltotemis, fill = fips) ) + 
+  geom_bar(stat="identity", position=position_dodge(), show_guide = FALSE) + 
+  facet_grid(fips ~ .)
+  ggtitle("Emissions in Baltimora and Los Angeles related to motor vehicle") +
+  ylab("tot log(PM2.5 in ton)") +
+  geom_text(aes(label=fips), size=5) 
 

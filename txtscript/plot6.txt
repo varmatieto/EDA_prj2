@@ -1,0 +1,70 @@
+#QUESTION 6
+#.Compare emissions from motor vehicle sources in Baltimore City with emissions 
+# from motor vehicle sources in Los Angeles County, California
+
+library (ggplot2)
+
+#read remote file and unzip it
+
+if (!file.exists("data/summarySCC_PM25.rds")) 
+{
+  url<- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
+  download.file(url, "exdata_data_NEI_data.zip")
+  unzip("exdata_data_NEI_data.zip", exdir = "data")
+  file.remove("exdata_data_NEI_data.zip")
+}
+
+
+dir("data")
+
+## load data file 
+NEI <- readRDS("data/summarySCC_PM25.rds")
+SCC <- readRDS("data/Source_Classification_Code.rds")
+
+
+
+# there are 4 EI.Sector related to motor vehicle sources 
+levels(SCC$EI.Sector) [grepl("Mobile - On-Road",levels(SCC$EI.Sector))]
+
+# there are 1138 SCC related to Mobile - On-Road
+motorSCC<-SCC$SCC[grepl("Mobile - On-Road",SCC[,"EI.Sector"])]
+length(motorSCC)
+
+# select data for Baltimora & Los Angeles (only 11416 obs.)
+balsNEI<-NEI[NEI$fips == "24510" | NEI$fips == "06037" ,]
+str(balsNEI)
+
+
+# in balsNEI 2099 out of 11416 are about motor vehicles
+
+motor_balsNEI<-balsNEI[balsNEI$SCC%in%motorSCC,]
+str(motor_balsNEI)
+
+
+# levels in dataset is only ON-ROAD
+motor_balsNEI$fips<-factor(motor_balsNEI$fips)
+motor_balsNEI$year<-factor(motor_balsNEI$year)
+motor_balsNEI$type<-factor(motor_balsNEI$type)
+levels(motor_balsNEI$type)
+levels(motor_balsNEI$fips)
+levels(motor_balsNEI$year)
+
+levels(motor_balsNEI$fips)<-c("LA","BA")
+
+str(motor_balsNEI)
+
+
+png("submitted_plot/plot6.png")
+
+ggplot(motor_balsNEI, aes( log(Emissions),fill=fips) ) +
+  geom_density(alpha=.3) +
+  facet_wrap( ~ year, ncol=2) +
+  labs(title = "Emissions in Baltimora and Los Angeles related to motor vehicle",
+       y = "log(PM2.5 in ton)", x = "cities in years")
+
+
+dev.off()
+
+
+
+

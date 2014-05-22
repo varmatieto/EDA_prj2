@@ -6,12 +6,16 @@ library (ggplot2)
 
 #read remote file and unzip it
 
-url<- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
-download.file(url, "exdata_data_NEI_data.zip")
-unzip("exdata_data_NEI_data.zip", exdir = "data")
-file.remove("exdata_data_NEI_data.zip")
+if (!file.exists("data/summarySCC_PM25.rds")) 
+{
+  url<- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
+  download.file(url, "exdata_data_NEI_data.zip")
+  unzip("exdata_data_NEI_data.zip", exdir = "data")
+  file.remove("exdata_data_NEI_data.zip")
+}
 
-dir()
+
+dir("data")
 
 ## load data file 
 NEI <- readRDS("data/summarySCC_PM25.rds")
@@ -37,7 +41,7 @@ motor_balsNEI<-balsNEI[balsNEI$SCC%in%motorSCC,]
 str(motor_balsNEI)
 
 
-# levels in dataset is only ON-ROAD
+# levels in dataset 
 motor_balsNEI$fips<-factor(motor_balsNEI$fips)
 motor_balsNEI$year<-factor(motor_balsNEI$year)
 motor_balsNEI$type<-factor(motor_balsNEI$type)

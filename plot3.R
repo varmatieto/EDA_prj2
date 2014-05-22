@@ -8,11 +8,14 @@
 library (ggplot2)
 
 #read remote file and unzip it
-
+if (!file.exists("data/summarySCC_PM25.rds")) 
+  {
 url<- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
 download.file(url, "exdata_data_NEI_data.zip")
 unzip("exdata_data_NEI_data.zip", exdir = "data")
 file.remove("exdata_data_NEI_data.zip")
+  }
+
 
 dir()
 
@@ -33,11 +36,11 @@ levels(baNEI$type)
 
 png("submitted_plot/plot3.png", width = 480, height = 480)
 
-ggplot(baNEI, aes(type,log(Emissions))) + 
-  geom_boxplot(aes(color = type),show_guide = FALSE, size = 1) + 
-  facet_grid(. ~ year) +  
-  ggtitle("Emissions in Baltimore per year") + 
+ggplot(baNEI, aes(year,log(Emissions))) + 
+  geom_boxplot(aes(color = year),show_guide = FALSE, size = 1) + 
+  facet_grid(. ~ type) +  
+  ggtitle("Emissions in Baltimore per type & year\n") + 
   labs(x = "type", y = "log(PM2.5 in ton)") +
-  theme(axis.text.x  = element_text(angle=90, vjust=0.5, size=8))
+  theme(axis.text.x  = element_text(angle=45, vjust=0.5, size=12))
 
 dev.off()
