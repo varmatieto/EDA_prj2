@@ -29,26 +29,31 @@ levels(SCC$EI.Sector) [grepl("Coal",levels(SCC$EI.Sector))]
 coalSCC<-SCC$SCC[grepl("Coal",SCC[,"EI.Sector"])]
 length(coalSCC)
 
-
+# get emissions related to coal only
 coalNEI<-NEI[NEI$SCC%in%coalSCC,]
 
 
 # 28480 out of 6497651 observation in NEI relates with coal
-
 str(coalNEI)
 
-# levels in dataset are in the three EI.Sector related to coal
+# check that levels in dataset are in the three EI.Sector related to coal
 levels(factor(coalNEI$SCC))%in%coalSCC
 
+# clean out all emissions==0
+coalNEIt<-coalNEI[(!coalNEI$Emissions==0),]
+coalNEIt$year<-factor(coalNEIt$year)
+
+str(coalNEIt)
 
 png("submitted_plot/plot4.png")
 
-g<-ggplot(coalNEI, aes(type,log(Emissions)))
-
-g + geom_boxplot(aes(color = type), show_guide = FALSE,
-               size = 1, alpha = 1/2) + facet_grid(. ~ year) +
-  labs(title = "PM2.5 emissions in U.S related to coal per year") + 
-  labs(x = "type", y = "log(PM2.5 in ton)")
+ggplot(coalNEIt, aes(x=log(Emissions), color=year, 
+                     fill=year)) +
+    geom_density(alpha=.2,size = 1.5, ) + 
+    labs(title = "PM2.5 emissions in U.S related to coal per year\n",
+         x = "log(PM2.5 in ton)", y = "density")
 
 dev.off()
+
+
 

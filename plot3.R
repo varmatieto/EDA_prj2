@@ -17,7 +17,7 @@ file.remove("exdata_data_NEI_data.zip")
   }
 
 
-dir()
+dir("data")
 
 ## load data file 
 NEI <- readRDS("data/summarySCC_PM25.rds")

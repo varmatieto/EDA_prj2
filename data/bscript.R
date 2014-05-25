@@ -359,6 +359,31 @@ g + geom_point(aes(color = type),
 
 dev.off()
 
+###### former plot in project as plot4
+
+png("eda2_46.png")
+g<-ggplot(coalNEI, aes(type,log(Emissions)))
+
+g + geom_boxplot(aes(color = type), show_guide = FALSE,
+                 size = 1, alpha = 1/2) + facet_grid(. ~ year) +
+    labs(title = "PM2.5 emissions in U.S related to coal per year") + 
+    labs(x = "type", y = "log(PM2.5 in ton)")
+
+dev.off()
+
+coalNEI$year<-factor(coalNEI$year)
+
+png("eda2_45.png")
+
+ggplot(coalNEI, aes(x=log(Emissions), color=year, 
+                     fill=year)) +
+    geom_density(alpha=.2,size = 1.5, ) + 
+    labs(title = "PM2.5 emissions in U.S related to coal per year\n",
+         x = "log(PM2.5 in ton)", y = "density")
+
+dev.off()
+
+
 
 #QUESTION 5
 #  How have emissions from motor vehicle sources 
